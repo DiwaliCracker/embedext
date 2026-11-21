@@ -1,0 +1,9 @@
+{
+  "name": "9xbuddy-link-fetcher",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-21",
+  "compatibility_flags": ["nodejs_compat"],
+  "browser": {
+    "binding": "MYBROWSER"
+  }
+}
