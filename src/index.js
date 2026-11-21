@@ -4,7 +4,8 @@ export default {
   async fetch(request, env) {
     const reqUrl = new URL(request.url);
     const targetUrl = reqUrl.searchParams.get("url");
-    const shouldRedirect = reqUrl.searchParams.get("redirect") === "true";
+    // Redirects to the link by default; pass ?url=...&json=true if you ever want the JSON response
+    const returnJson = reqUrl.searchParams.get("json") === "true";
 
     if (!targetUrl) {
       return new Response(
@@ -69,30 +70,31 @@ export default {
 
       const lastLink = workerLinks[workerLinks.length - 1];
 
-      if (shouldRedirect) {
-        return Response.redirect(lastLink.href, 302);
+      if (returnJson) {
+        return new Response(
+          JSON.stringify(
+            {
+              status: "success",
+              total_found: workerLinks.length,
+              selected_text: lastLink.text,
+              link: lastLink.href,
+              all_worker_links: workerLinks,
+            },
+            null,
+            2
+          ),
+          {
+            status: 200,
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*",
+            },
+          }
+        );
       }
 
-      return new Response(
-        JSON.stringify(
-          {
-            status: "success",
-            total_found: workerLinks.length,
-            selected_text: lastLink.text,
-            link: lastLink.href,
-            all_worker_links: workerLinks,
-          },
-          null,
-          2
-        ),
-        {
-          status: 200,
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-          },
-        }
-      );
+      // Immediately sends the browser/client to the generated workers.dev URL
+      return Response.redirect(lastLink.href, 302);
     } catch (err) {
       if (browser) {
         await browser.close();
