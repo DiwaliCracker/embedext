@@ -1,0 +1,7 @@
+{
+  "name": "9xbuddy-link-fetcher",
+  "private": true,
+  "dependencies": {
+    "@cloudflare/puppeteer": "^1.0.0"
+  }
+}
